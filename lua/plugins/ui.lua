@@ -14,6 +14,7 @@ return {
     end,
   },
   { "rebelot/kanagawa.nvim", lazy = false, priority = 1000 },
+  { "EdenEast/nightfox.nvim", lazy = false, priority = 1000 },
 
   -- Ícones para a UI
   { "nvim-tree/nvim-web-devicons", lazy = true },
