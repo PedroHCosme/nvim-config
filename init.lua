@@ -34,3 +34,6 @@ require("lazy").setup("plugins", {
     notify = true,
   },
 })
+
+-- Carrega e configura os comandos de tema APÓS o setup do lazy
+require("core.colorscheme")

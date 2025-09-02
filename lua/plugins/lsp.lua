@@ -24,13 +24,10 @@ return {
   {
     "neovim/nvim-lspconfig",
     dependencies = {
-      "williamboman/mason-lspconfig.nvim",
-      "hrsh7th/cmp-nvim-lsp", -- Adicionar como dependência
+      "williamboman/mason-lspconfig.nvim"
     },
     config = function()
       local lspconfig = require("lspconfig")
-      -- CORREÇÃO: Obter capabilities do cmp-nvim-lsp
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
       -- Função a ser executada quando um servidor LSP é anexado a um buffer
       local on_attach = function(client, bufnr)
