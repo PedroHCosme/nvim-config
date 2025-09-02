@@ -5,7 +5,7 @@
 
 return {
   {
-    "github/Copilot.nvim",
+    "github/Copilot.vim",
     cmd = "Copilot",
     event = "InsertEnter", -- Carrega o plugin ao entrar no modo de inserção
     config = function()

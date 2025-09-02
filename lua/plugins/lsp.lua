@@ -1,64 +1,59 @@
+-- = an======================================================================= --
+-- ==                                  LSP                                 == --
 -- ========================================================================== --
--- ==                                 LSP                                  == --
--- ========================================================================== --
--- Configuração do Language Server Protocol (LSP).
--- A autocompletação é fornecida pelo GitHub Copilot.
-
 return {
   {
+    "williamboman/mason.nvim",
+    config = function()
+      require("mason").setup()
+    end,
+  },
+  {
+    "williamboman/mason-lspconfig.nvim",
+    dependencies = { "williamboman/mason.nvim" },
+    config = function()
+      require("mason-lspconfig").setup({
+        -- CORREÇÃO 1: Nome do servidor para TypeScript/JavaScript corrigido aqui
+        ensure_installed = {
+          "lua_ls",
+          "typescript-language-server", -- 'tsserver' foi renomeado para o nome correto do pacote do Mason
+        },
+      })
+    end,
+  },
+  {
     "neovim/nvim-lspconfig",
-    dependencies = {
-      -- Gerenciador de servidores LSP
-      "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
-    },
+    dependencies = { "williamboman/mason-lspconfig.nvim" },
     config = function()
       local lspconfig = require("lspconfig")
-      local mason = require("mason")
-      local mason_lspconfig = require("mason-lspconfig")
-
-      -- Inicializar Mason para gerenciar LSPs
-      mason.setup()
-
-      -- Lista de servidores LSP para instalar automaticamente
-      local servers = {
-        "lua_ls",
-        "cssls",
-        "html",
-        "tsserver",
-        "pyright",
-        "rust_analyzer",
-        "gopls",
-      }
-
-      mason_lspconfig.setup({
-        ensure_installed = servers,
-      })
+      local capabilities = require("lspconfig.util").default_capabilities()
 
       -- Função a ser executada quando um servidor LSP é anexado a um buffer
       local on_attach = function(client, bufnr)
-        local keymap = vim.keymap
-        local opts = { noremap = true, silent = true, buffer = bufnr }
+        local map = function(keys, func, desc)
+          vim.keymap.set("n", keys, func, { buffer = bufnr, noremap = true, silent = true, desc = desc })
+        end
 
         -- Atalhos do LSP
-        keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-        keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-        keymap.set("n", "K", vim.lsp.buf.hover, opts)
-        keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-        keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
-        keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-        keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
-        keymap.set("n", "gr", vim.lsp.buf.references, opts)
+        map("gD", vim.lsp.buf.declaration, "Ir para declaração")
+        map("gd", vim.lsp.buf.definition, "Ir para definição")
+        map("K", vim.lsp.buf.hover, "Mostrar documentação (hover)")
+        map("gi", vim.lsp.buf.implementation, "Ir para implementação")
+        map("<leader>ca", vim.lsp.buf.code_action, "Ações de código")
+        map("<leader>cr", vim.lsp.buf.rename, "Renomear")
       end
 
-      -- Configurar cada servidor LSP
-      mason_lspconfig.setup_handlers({
-        function(server_name)
-          lspconfig[server_name].setup({
-            on_attach = on_attach,
-          })
-        end,
-      })
+      -- Lista de servidores que o lspconfig irá configurar
+      -- (aqui usamos os nomes que o lspconfig entende, como 'tsserver')
+      local servers = { "lua_ls", "tsserver" }
+
+      for _, server_name in ipairs(servers) do
+        -- CORREÇÃO 2: 'setup_handlers' foi trocado por 'setup'
+        lspconfig[server_name].setup({
+          on_attach = on_attach,
+          capabilities = capabilities,
+        })
+      end
     end,
   },
 }
