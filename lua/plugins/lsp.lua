@@ -13,20 +13,24 @@ return {
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
-        -- CORREÇÃO 1: Nome do servidor para TypeScript/JavaScript corrigido aqui
+        -- O nome do servidor do lspconfig deve ser usado aqui
         ensure_installed = {
           "lua_ls",
-          "typescript-language-server", -- 'tsserver' foi renomeado para o nome correto do pacote do Mason
+          "ts_ls", -- Corrigido de "typescript-language-server"
         },
       })
     end,
   },
   {
     "neovim/nvim-lspconfig",
-    dependencies = { "williamboman/mason-lspconfig.nvim" },
+    dependencies = {
+      "williamboman/mason-lspconfig.nvim",
+      "hrsh7th/cmp-nvim-lsp", -- Adicionar como dependência
+    },
     config = function()
       local lspconfig = require("lspconfig")
-      local capabilities = require("lspconfig.util").default_capabilities()
+      -- CORREÇÃO: Obter capabilities do cmp-nvim-lsp
+      local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
       -- Função a ser executada quando um servidor LSP é anexado a um buffer
       local on_attach = function(client, bufnr)
@@ -44,11 +48,9 @@ return {
       end
 
       -- Lista de servidores que o lspconfig irá configurar
-      -- (aqui usamos os nomes que o lspconfig entende, como 'tsserver')
-      local servers = { "lua_ls", "tsserver" }
+      local servers = { "lua_ls", "ts_ls" }
 
       for _, server_name in ipairs(servers) do
-        -- CORREÇÃO 2: 'setup_handlers' foi trocado por 'setup'
         lspconfig[server_name].setup({
           on_attach = on_attach,
           capabilities = capabilities,
